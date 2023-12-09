@@ -28,7 +28,7 @@ public class HttpUtil {
         }catch (Exception e){
             e.printStackTrace();
         }
-        Log.e(TAG, "senOkHttpLogin: "+String.valueOf(jsonObject) );
+//        Log.e(TAG, "senOkHttpLogin: "+String.valueOf(jsonObject) );
         RequestBody requestBody = RequestBody.create(String.valueOf(jsonObject),JSON);
         Request request = new Request.Builder().url(url).post(requestBody).build();
         client.newCall(request).enqueue(callback);

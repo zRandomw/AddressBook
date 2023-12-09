@@ -59,16 +59,16 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
             textBuild.clear();
             textBuild.append(contactsBean.getName());
             textBuild.setSpan(blueSpan, contactsBean.getHighlightedStart(), contactsBean.getHighlightedEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            holder.tvNumber.setText(contactsBean.getNumberList().get(contactsBean.getMatchIndex()));
+            holder.tvphone.setText(contactsBean.getphone());
             holder.nickName.setText(textBuild);
         } else if (contactsBean.getMatchType() == 2) {//高亮号码
             textBuild.clear();
-            textBuild.append(contactsBean.getNumberList().get(contactsBean.getMatchIndex()));
+            textBuild.append(contactsBean.getphone());
             textBuild.setSpan(blueSpan, contactsBean.getHighlightedStart(), contactsBean.getHighlightedEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            holder.tvNumber.setText(textBuild);
+            holder.tvphone.setText(textBuild);
             holder.nickName.setText(contactsBean.getName());
         } else {//不高亮
-            holder.tvNumber.setText(contactsBean.getNumberList().get(contactsBean.getMatchIndex()));
+            holder.tvphone.setText(contactsBean.getphone());
             holder.nickName.setText(contactsBean.getName() + "");
         }
 
@@ -145,13 +145,13 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView nickName;
-        private final TextView tvNumber;
+        private final TextView tvphone;
         private final View diviView;
 
         public ViewHolder(View itemView) {
             super(itemView);
             nickName = (TextView) itemView.findViewById(R.id.tv_name);
-            tvNumber = (TextView) itemView.findViewById(R.id.tv_number);
+            tvphone = (TextView) itemView.findViewById(R.id.tv_phone);
             diviView = itemView.findViewById(R.id.vw_divisition);
             Log.e(TAG, "nickName: "+nickName.getHeight() );
         }

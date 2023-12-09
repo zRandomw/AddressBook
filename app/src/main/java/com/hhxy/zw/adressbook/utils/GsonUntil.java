@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GsonUntil {
@@ -54,7 +55,7 @@ public class GsonUntil {
         }return false;
     }
 
-    public static List<ContactsBean> handleUserList(String data) throws JSONException {
+    public static ArrayList<ContactsBean> handleUserList(String data) throws JSONException {
 
         return new Gson().fromJson(data,new TypeToken<List<ContactsBean>>(){}.getType());
     }

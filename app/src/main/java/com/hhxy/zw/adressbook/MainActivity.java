@@ -1,6 +1,7 @@
 package com.hhxy.zw.adressbook;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-
+        getContacts();
     }
 
     private void initView() {
@@ -199,30 +201,40 @@ public class MainActivity extends AppCompatActivity {
 //                });
 //
 //    }
+private static final String TAG = "MainActivity";
     private void getContacts(){
-        SharedPreferences data = getSharedPreferences("data", MODE_PRIVATE);
-        String token = data.getString("token", "");
+        SharedPreferences data = getSharedPreferences("token", MODE_PRIVATE);
+        String token = data.getString("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpZCI6MTYsImV4cCI6MTcwMjcyMzM4NywiaWF0IjoxNzAyMTE4NTg3LCJ1c2VybmFtZSI6IjEwMDczNTcifQ.IpaPgExAvSuymcoS-SlVxSQ5qJJR_CGNEi9V_eZKW1fURkCQcawgQm2zTSVt5xJ_8tLnfjlkUshGpGggi-zxMw");
         long poke = data.getLong("poke", 0);
         contactLists.clear();
         searchContactLists.clear();
+//        Log.e(TAG, "getContacts: "+token );
         HttpUtil.sendGetDataForUser(token, poke, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 runOnUiThread(()->{
                     Toast.makeText(MainActivity.this,e.toString(),Toast.LENGTH_LONG).show();
+
                 });
             }
-
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     String data=response.body()!=null?response.body().string():null;
+                Log.e(TAG, "getContacts: 进来"+data );
                 JSONObject jsonObject = null;
                 try {
                     jsonObject = new JSONObject(data);
                     String msg = jsonObject.getString("msg");
                     if (jsonObject.getInt("code")==200) {
                         JSONArray data1 = jsonObject.getJSONArray("data");
-                        GsonUntil.handleUserList(String.valueOf(data1));
+                        contactLists.addAll(Util.getContactData(GsonUntil.handleUserList(String.valueOf(data1))));
+                        searchContactLists.addAll(Util.getContactData(GsonUntil.handleUserList(String.valueOf(data1))));
+                        Log.e(TAG, "onResponse: "+contactLists.get(1).getName() );
+                        runOnUiThread(()->{
+                            contactAdapter.notifyDataSetChanged();
+                        }
+                        );
                     }else runOnUiThread(()->{
                         Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
                     });
@@ -252,13 +264,13 @@ public class MainActivity extends AppCompatActivity {
             //因为每次搜索的结果不同，所以匹配类型不同，但是数据源都是同一个数据源，所以每次搜索前，要重置数据
             resetSearchData();
             if (RegexChk.isNumeric(inputStr)) {//如果是数字
-                findDataByNumberOrCN(inputStr);
+                findDataByphoneOrCN(inputStr);
             } else if (RegexChk.isContainChinese(inputStr)) {//如果含义中文，需要精确匹配
-                findDataByNumberOrCN(inputStr);
+                findDataByphoneOrCN(inputStr);
             } else if (RegexChk.isEnglishAlphabet(inputStr)) {//是不是全是英文字母或者是拼音的话
                 findDataByEN(inputStr);
             } else {//需要精确匹配
-                findDataByNumberOrCN(inputStr);
+                findDataByphoneOrCN(inputStr);
             }
             contactAdapter.notifyDataSetChanged();
         }
@@ -270,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void findDataByNumberOrCN(String inputStr) {
+    private void findDataByphoneOrCN(String inputStr) {
         for (int i = 0; i < searchContactLists.size(); i++) {
             ContactsBean contactsBean = searchContactLists.get(i);
             if (!TextUtils.isEmpty(contactsBean.getName()) && contactsBean.getName().contains(inputStr)) {
@@ -280,20 +292,16 @@ public class MainActivity extends AppCompatActivity {
                 contactLists.add(contactsBean);
                 continue;
             }
-            if (contactsBean.getNumberList().size() > 0) {
-                for (int j = 0; j < contactsBean.getNumberList().size(); j++) {
-                    String number = contactsBean.getNumberList().get(j);
-                    if (!TextUtils.isEmpty(number) && number.contains(inputStr)) {
-                        contactsBean.setShowNumberIndex(j);//显示号码的下标
+                    String phone = contactsBean.getphone();
+                    if (!TextUtils.isEmpty(phone) && phone.contains(inputStr)) {
+//                        contactsBean.setShowphoneIndex(j);//显示号码的下标
                         contactsBean.setMatchType(2);//电话匹配
-                        contactsBean.setHighlightedStart(number.indexOf(inputStr));
+                        contactsBean.setHighlightedStart(phone.indexOf(inputStr));
                         contactsBean.setHighlightedEnd(contactsBean.getHighlightedStart() + inputStr.length());
                         contactLists.add(contactsBean);
                     }
-                }
             }
 
-        }
     }
 
     //通过拼音或者英文字母
@@ -444,8 +452,6 @@ public class MainActivity extends AppCompatActivity {
                             //跳出循环已找到
                             break;
                         }
-
-
                     }
                 }
 

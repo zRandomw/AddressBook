@@ -18,46 +18,25 @@ public class Util {
     private static String indexStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
-//    public static ArrayList<ContactsBean> getContactData(Context context, ArrayList<ContactsBean> searchContactLists) {
-//        //得到ContentResolver对象
-//        ContentResolver cr = context.getContentResolver();
-//        //取得电话本中开始一项的光标
-//        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-//        //向下移动光标
-//        while (cursor.moveToNext()) {
-//            //取得联系人名字
-//            int nameFieldColumnIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
-//            String name = cursor.getString(nameFieldColumnIndex);
-//            //取得联系人ID
-//            @SuppressLint("Range") String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-//            //要获取所有的联系人,一个联系人会有多个号码
-//            getContactById(cr, id, name, searchContactLists);
-//        }
-//        Collections.sort(searchContactLists, new SortByPinyin());//数据排序
-//        return searchContactLists;
-//    }
+    public static ArrayList<ContactsBean> getContactData(ArrayList<ContactsBean> searchContactLists) {
+        //向下移动光标
+            //取得联系人名字
+        searchContactLists.forEach(o->{
+            getContactById(o);
+        });
 
-//    private static void getContactById(ContentResolver cr, String id, String name, ArrayList<ContactsBean> searchContactLists) {
-//        if (!TextUtils.isEmpty(id)) {
-//            Cursor phone = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=" + id, null, null);
-//            if (null != phone) {
-//                ContactsBean contact = new ContactsBean();
-//                contact.setName(name);
-//                contact.setid(id);
-//
-//                if (!TextUtils.isEmpty(contact.getName())) {
-//                    getPinyinList(contact);
-//                } else {
-//                    contact.setPinyinFirst("#");
-//                }
-//                while (phone.moveToNext()) {
-//                    @SuppressLint("Range") String phoneNumber = phone.getString(phone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-//                    contact.getNumberList().add(phoneNumber);
-//                }
-//                searchContactLists.add(contact);
-//            }
-//        }
-//    }
+        Collections.sort(searchContactLists, new SortByPinyin());//数据排序
+
+        return searchContactLists;
+    }
+
+    private static void getContactById(ContactsBean c) {
+                if (c.getName()!=null) {
+                    getPinyinList(c);
+                } else {
+                    c.setPinyinFirst("#");
+                }
+        }
 
     private static void getPinyinList(ContactsBean contactsBean) {
         StringBuffer bufferNamePiny = new StringBuffer();//NIHAO
