@@ -23,11 +23,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hhxy.zw.adressbook.adapter.PhoneContactAdapter;
 import com.hhxy.zw.adressbook.bean.ContactsBean;
+import com.hhxy.zw.adressbook.utils.GsonUntil;
 import com.hhxy.zw.adressbook.utils.HttpUtil;
 import com.hhxy.zw.adressbook.utils.RegexChk;
 import com.hhxy.zw.adressbook.utils.Util;
 import com.hhxy.zw.adressbook.view.QuickIndexBar;
 import com.hhxy.zw.adressbook.view.StickyHeaderDecoration;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -211,6 +216,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     String data=response.body()!=null?response.body().string():null;
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(data);
+                    String msg = jsonObject.getString("msg");
+                    if (jsonObject.getInt("code")==200) {
+                        JSONArray data1 = jsonObject.getJSONArray("data");
+                        GsonUntil.handleUserList(String.valueOf(data1));
+                    }else runOnUiThread(()->{
+                        Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
+                    });
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
 
             }
         });

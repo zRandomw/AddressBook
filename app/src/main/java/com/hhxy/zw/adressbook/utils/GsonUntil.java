@@ -56,6 +56,6 @@ public class GsonUntil {
 
     public static List<ContactsBean> handleUserList(String data) throws JSONException {
 
-        return new Gson().fromJson(data,new TypeToken<List<User>>(){}.getType());
+        return new Gson().fromJson(data,new TypeToken<List<ContactsBean>>(){}.getType());
     }
 }

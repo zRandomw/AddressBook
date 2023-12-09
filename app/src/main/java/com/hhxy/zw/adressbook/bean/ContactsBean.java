@@ -10,20 +10,27 @@ import java.util.ArrayList;
  */
 
 public class ContactsBean implements Comparable<ContactsBean> {
-    private String contactId;//通讯录ID
+    private String id;//通讯录ID
     private String name; //名字
-    private String number;//电话号码
+    private String phone;//电话号码
     private String pinyinFirst;//拼音首字母用于悬浮栏
-    private int showNumberIndex = 0;//因为一个人可能会有多个号码
+    private int showphoneIndex = 0;//因为一个人可能会有多个号码
     private int highlightedStart = 0;//需要高亮的开始下标
     private int highlightedEnd = 0;//需要高亮的结束下标
     private String matchPin = "";//用来匹配的拼音每个字的首字母比如：你好，NH
     private String namePinYin = "";//全名字拼音,比如：你好,NIHAO
     private int matchType = 0;//匹配类型，名字1，电话号码2，其他0,根据输入的来判断
     private ArrayList<String> namePinyinList = new ArrayList<>();//名字拼音集合，比如你好，NI,HAO
-    private ArrayList<String> numberList = new ArrayList<>();//电话号码集合，一个人可能会有多个号码
+    private ArrayList<String> phoneList = new ArrayList<>();//电话号码集合，一个人可能会有多个号码
     private int matchIndex = 0;//匹配到号码后的下标
-
+    private String policeId;
+    private String deptId;
+    private String deptName;
+    private Object password;
+    private String sex;
+    private String cardId;
+    private String job;
+    private int isLeader;
     public int getMatchIndex() {
         return matchIndex;
     }
@@ -40,12 +47,12 @@ public class ContactsBean implements Comparable<ContactsBean> {
         this.pinyinFirst = pinyinFirst;
     }
 
-    public String getContactId() {
-        return contactId;
+    public String getid() {
+        return id;
     }
 
-    public void setContactId(String contactId) {
-        this.contactId = contactId;
+    public void setid(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -56,20 +63,20 @@ public class ContactsBean implements Comparable<ContactsBean> {
         this.name = name;
     }
 
-    public String getNumber() {
-        return number;
+    public String getphone() {
+        return phone;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setphone(String phone) {
+        this.phone = phone;
     }
 
-    public int getShowNumberIndex() {
-        return showNumberIndex;
+    public int getShowphoneIndex() {
+        return showphoneIndex;
     }
 
-    public void setShowNumberIndex(int showNumberIndex) {
-        this.showNumberIndex = showNumberIndex;
+    public void setShowphoneIndex(int showphoneIndex) {
+        this.showphoneIndex = showphoneIndex;
     }
 
     public int getHighlightedStart() {
@@ -120,12 +127,12 @@ public class ContactsBean implements Comparable<ContactsBean> {
         this.namePinyinList = namePinyinList;
     }
 
-    public ArrayList<String> getNumberList() {
-        return numberList;
+    public ArrayList<String> getphoneList() {
+        return phoneList;
     }
 
-    public void setNumberList(ArrayList<String> numberList) {
-        this.numberList = numberList;
+    public void setphoneList(ArrayList<String> phoneList) {
+        this.phoneList = phoneList;
     }
 
     @Override
