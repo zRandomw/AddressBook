@@ -16,8 +16,6 @@ import java.util.Comparator;
 
 public class Util {
     private static String indexStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-
     public static ArrayList<ContactsBean> getContactData(ArrayList<ContactsBean> searchContactLists) {
         //向下移动光标
             //取得联系人名字
@@ -26,7 +24,6 @@ public class Util {
         });
 
         Collections.sort(searchContactLists, new SortByPinyin());//数据排序
-
         return searchContactLists;
     }
 

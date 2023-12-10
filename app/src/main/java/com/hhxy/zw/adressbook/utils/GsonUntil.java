@@ -22,15 +22,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GsonUntil {
-    public  Context context;
-
-    public Context getContext() {
-        return context;
-    }
+public class GsonUntil{
 
     private static final String TAG = "GsonUntil";
-    public static boolean handleLogin(String data,Context context){
+    public static boolean handleLogin(String data,ToActivity t){
         if(!TextUtils.isEmpty(data)){
             try {
                 JSONObject jsonObject = new JSONObject(data);
@@ -39,24 +34,16 @@ public class GsonUntil {
                 int code = jsonObject.getInt("code");
                 if (code==200){
                     String token = jsonObject.getString("token");
-                    SharedPreferences.Editor editor=context.getSharedPreferences("token",MODE_PRIVATE).edit();
-                    editor.putString("token",token);
-                    editor.apply();
-                    return true;
+                    return t.SharedPreferencesEdit(token);
                 }else{
-                    ((Activity) context).runOnUiThread(()->{
-                        Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
-                    });
-                    return false;
+                    return !t.setShowToast(msg);
                 }
             } catch (JSONException e) {
                  e.printStackTrace();
             }
         }return false;
     }
-
     public static ArrayList<ContactsBean> handleUserList(String data) throws JSONException {
-
         return new Gson().fromJson(data,new TypeToken<List<ContactsBean>>(){}.getType());
     }
 }

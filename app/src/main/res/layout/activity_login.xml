@@ -51,6 +51,7 @@
             <Button
                 android:id="@+id/login"
                 android:layout_width="0dp"
+                android:background="@drawable/joinbtn"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="登录"

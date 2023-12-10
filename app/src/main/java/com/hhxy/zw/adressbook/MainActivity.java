@@ -1,10 +1,8 @@
 package com.hhxy.zw.adressbook;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -18,8 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,13 +35,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -214,14 +203,13 @@ private static final String TAG = "MainActivity";
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 runOnUiThread(()->{
                     Toast.makeText(MainActivity.this,e.toString(),Toast.LENGTH_LONG).show();
-
                 });
             }
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     String data=response.body()!=null?response.body().string():null;
-                Log.e(TAG, "getContacts: 进来"+data );
+//                Log.e(TAG, "getContacts: 进来"+data );
                 JSONObject jsonObject = null;
                 try {
                     jsonObject = new JSONObject(data);
@@ -458,4 +446,5 @@ private static final String TAG = "MainActivity";
             }
         }
     }
+
 }

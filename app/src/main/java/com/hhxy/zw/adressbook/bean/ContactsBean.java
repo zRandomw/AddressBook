@@ -3,13 +3,14 @@ package com.hhxy.zw.adressbook.bean;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by Administrator on 2017/5/26.
  */
 
-public class ContactsBean implements Comparable<ContactsBean> {
+public class ContactsBean implements Comparable<ContactsBean> , Serializable {
     private String id;//通讯录ID
     private String name; //名字
     private String phone;//电话号码
@@ -26,6 +27,39 @@ public class ContactsBean implements Comparable<ContactsBean> {
     private String policeId;
     private String deptId;
     private String deptName;
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public String getJob() {
+        return job;
+    }
+
+    public void setJob(String job) {
+        this.job = job;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(String deptId) {
+        this.deptId = deptId;
+    }
+
+    public String getPoliceId() {
+        return policeId;
+    }
+
+    public void setPoliceId(String policeId) {
+        this.policeId = policeId;
+    }
+
     private Object password;
     private String sex;
     private String cardId;

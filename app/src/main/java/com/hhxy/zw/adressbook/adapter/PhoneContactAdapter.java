@@ -1,5 +1,6 @@
 package com.hhxy.zw.adressbook.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -33,6 +34,7 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
     private final LayoutInflater mInflater;
     private char lastChar = '\u0000';
     private int DisplayIndex = 0;
+    private int Position=0;
     SpannableStringBuilder textBuild = new SpannableStringBuilder();
 
     public PhoneContactAdapter(Context context, ArrayList<ContactsBean> contactLists) {
@@ -45,13 +47,15 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = mInflater.inflate(R.layout.item_phone_contact, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
         view.setOnClickListener(v->{
             Log.e(TAG, "onCreateHeaderViewHolder: 666" );
-            parent.getContext().startActivity(new Intent(parent.getContext(), HomeActivity.class));
+            Intent intent = new Intent(parent.getContext(), HomeActivity.class);
+            intent.putExtra("user",contactLists.get(viewHolder.getAdapterPosition()));
+            parent.getContext().startActivity(intent);
         });
-        return new ViewHolder(view);
+        return viewHolder;
     }
-
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ContactsBean contactsBean = contactLists.get(position);
@@ -71,8 +75,6 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
             holder.tvphone.setText(contactsBean.getphone());
             holder.nickName.setText(contactsBean.getName() + "");
         }
-
-
         if (position == 0) {
             holder.diviView.setVisibility(View.INVISIBLE);
         } else {
