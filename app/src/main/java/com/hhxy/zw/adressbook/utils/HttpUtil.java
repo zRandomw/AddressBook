@@ -53,12 +53,23 @@ public class HttpUtil {
      }
 
     public static void sendGetDataForUser(String token,Long poke,Callback callback) {
-        String url= HttpUtil.url+"/api/people/afterList/"+poke;
+        String url= HttpUtil.url+"/api/people/list";
         OkHttpClient client = new OkHttpClient();
         Request request=new Request.Builder().header("Authorization",token).url(url).build();
         client.newCall(request).enqueue(callback);
     }
-
+    public static void sendGetDataForDeptNameList(String token,Callback callback) {
+        String url= HttpUtil.url+"/api/dept/list";
+        OkHttpClient client = new OkHttpClient();
+        Request request=new Request.Builder().header("Authorization",token).url(url).build();
+        client.newCall(request).enqueue(callback);
+    }
+    public static void sendGetDataUserForDeptId(String token,int id,Callback callback) {
+        String url= HttpUtil.url+"/api/people/getByDeptId/"+id;
+        OkHttpClient client = new OkHttpClient();
+        Request request=new Request.Builder().header("Authorization",token).url(url).build();
+        client.newCall(request).enqueue(callback);
+    }
 //    public static void sendOkhttpPersonal(String token,Callback callback){
 //        String url= SetHttpIpPort.url+"api/common/user/getInfo";
 //        OkHttpClient client = new OkHttpClient();

@@ -3,15 +3,23 @@ package com.hhxy.zw.adressbook.bean;
 
 import androidx.annotation.NonNull;
 
+
+import org.litepal.crud.LitePalSupport;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+
 
 /**
- * Created by Administrator on 2017/5/26.
+ *
  */
 
-public class ContactsBean implements Comparable<ContactsBean> , Serializable {
-    private String id;//通讯录ID
+public class ContactsBean extends LitePalSupport implements Comparable<ContactsBean> , Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private long id;//通讯录ID
     private String name; //名字
     private String phone;//电话号码
     private String pinyinFirst;//拼音首字母用于悬浮栏
@@ -21,13 +29,33 @@ public class ContactsBean implements Comparable<ContactsBean> , Serializable {
     private String matchPin = "";//用来匹配的拼音每个字的首字母比如：你好，NH
     private String namePinYin = "";//全名字拼音,比如：你好,NIHAO
     private int matchType = 0;//匹配类型，名字1，电话号码2，其他0,根据输入的来判断
-    private ArrayList<String> namePinyinList = new ArrayList<>();//名字拼音集合，比如你好，NI,HAO
+
+    private List<String> namePinyinList = new ArrayList<>();//名字拼音集合，比如你好，NI,HAO
 //    private ArrayList<String> phoneList = new ArrayList<>();//电话号码集合，一个人可能会有多个号码
-    private int matchIndex = 0;//匹配到号码后的下标
+    private int matchIndex = 0;
+    //匹配到号码后的下标
     private String policeId;
     private String deptId;
     private String deptName;
+    private String sex;
+    public String getSex() {
+        return sex;
+    }
 
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
+    }
+
+    private String cardId;
+    private String job;
     public String getDeptName() {
         return deptName;
     }
@@ -60,11 +88,11 @@ public class ContactsBean implements Comparable<ContactsBean> , Serializable {
         this.policeId = policeId;
     }
 
-    private Object password;
-    private String sex;
-    private String cardId;
-    private String job;
+
     private int isLeader;
+
+    public ContactsBean() {
+    }
     public int getMatchIndex() {
         return matchIndex;
     }
@@ -81,11 +109,11 @@ public class ContactsBean implements Comparable<ContactsBean> , Serializable {
         this.pinyinFirst = pinyinFirst;
     }
 
-    public String getid() {
+    public Long getid() {
         return id;
     }
 
-    public void setid(String id) {
+    public void setid(Long id) {
         this.id = id;
     }
 
@@ -153,7 +181,7 @@ public class ContactsBean implements Comparable<ContactsBean> , Serializable {
         this.matchType = matchType;
     }
 
-    public ArrayList<String> getNamePinyinList() {
+    public List<String> getNamePinyinList() {
         return namePinyinList;
     }
 
@@ -172,5 +200,33 @@ public class ContactsBean implements Comparable<ContactsBean> , Serializable {
     @Override
     public int compareTo(@NonNull ContactsBean o) {
         return 0;
+    }
+
+    public long getId() {
+        return this.id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getPhone() {
+        return this.phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public int getIsLeader() {
+        return this.isLeader;
+    }
+
+    public void setIsLeader(int isLeader) {
+        this.isLeader = isLeader;
+    }
+
+    public void setNamePinyinList(List<String> namePinyinList) {
+        this.namePinyinList = namePinyinList;
     }
 }

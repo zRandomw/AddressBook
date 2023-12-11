@@ -3,24 +3,32 @@ package com.hhxy.zw.adressbook;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hhxy.zw.adressbook.adapter.PhoneContactAdapter;
 import com.hhxy.zw.adressbook.bean.ContactsBean;
+import com.hhxy.zw.adressbook.bean.Dept;
 import com.hhxy.zw.adressbook.utils.GsonUntil;
 import com.hhxy.zw.adressbook.utils.HttpUtil;
 import com.hhxy.zw.adressbook.utils.RegexChk;
@@ -31,9 +39,11 @@ import com.hhxy.zw.adressbook.view.StickyHeaderDecoration;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.tablemanager.Connector;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -48,24 +58,40 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<ContactsBean> contactLists = new ArrayList<>();
     ArrayList<ContactsBean> searchContactLists = new ArrayList<>();//用于搜索的集合数据
     private PhoneContactAdapter contactAdapter;
+    SharedPreferences s_data ;
     private LinearLayoutManager manager;
     private StickyHeaderDecoration decoration;
-
+    private Spinner spinner;
+    ArrayAdapter<Dept> sAdapter;
+    List<Dept> deptNameList;
+    String token;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Connector.getDatabase();
+        s_data=getSharedPreferences("token",MODE_PRIVATE);
         initView();
+        token= s_data.getString("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpZCI6MjUsImV4cCI6MTcwMjgyMTM1MiwiaWF0IjoxNzAyMjE2NTUyLCJ1c2VybmFtZSI6IjEwMDczNTcifQ.dPf8GCOscgN0iJxwXitI9_82uWItId-WddP9OfcJei4X8B134laF-0KYWWjczS6LNI6t1pixCisVg1BVyyEd1Q");
         getContacts();
+        getDeptNameList();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initView() {
+        spinner=(Spinner)findViewById(R.id.sp);
         //搜索框
         mEtSearch = (EditText) findViewById(R.id.mEtSearch);
         //索引
         quickIndexBar = (QuickIndexBar) findViewById(R.id.qiBar);
         //数据列表
         rvContacts = (RecyclerView) findViewById(R.id.rvContacts);
+        deptNameList=new ArrayList<>();
+        Dept dept = new Dept();
+        dept.setName("全部");
+        deptNameList.add(dept);
+        sAdapter=new ArrayAdapter<Dept>(this,R.layout.item_for_custom_spinner,deptNameList);
+        spinner.setAdapter(sAdapter);
         manager = new LinearLayoutManager(this);
         rvContacts.setLayoutManager(manager);
         rvContacts.setHasFixedSize(true);
@@ -81,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 // 隐藏软键盘
                 imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
-
                 for (int i = 0; i < contactLists.size(); i++) {
 
                     if (letter.equals(contactLists.get(i).getPinyinFirst() + "")) {
@@ -103,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         });
         //触摸隐藏键盘
         rvContacts.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -129,75 +155,78 @@ public class MainActivity extends AppCompatActivity {
                 filtDatas(s);
             }
         });
+        final int[] flag = {0};
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (flag[0] == 0){
+                    flag[0] = flag[0] + 1;
+                    return;
+                }
+
+                if (position==0){
+                    getContacts();
+                    return;
+                }
+                int id1 = ((Dept) parent.getItemAtPosition(position)).getId();
+                searchContactLists.clear();
+                contactLists.clear();
+
+                HttpUtil.sendGetDataUserForDeptId(token, id1,new Callback() {
+                    @Override
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                            String data=response.body()!=null?response.body().string():null;
+                        JSONObject jsonObject = null;
+                        try {
+                            jsonObject = new JSONObject(data);
+                            String msg = jsonObject.getString("msg");
+                            if (jsonObject.getInt("code")==200) {
+                                JSONArray data1 = jsonObject.getJSONArray("data");
+                                contactLists.addAll(Util.getContactData(GsonUntil.handleUserList(String.valueOf(data1))));
+                                searchContactLists.addAll(Util.getContactData(GsonUntil.handleUserList(String.valueOf(data1))));
+                                runOnUiThread(()->{
+                                            contactAdapter.notifyDataSetChanged();
+                                }
+                                );
+                            }else runOnUiThread(()->{
+                                Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
+                            });
+
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+                });
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
-//    private void getContactsByPerm() {
-//        //先获取手机和sim卡联系人
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, 1);
-//        } else {
-//            getContacts(this);
-//        }
-//    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == 1) {
-//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                getContacts(this);
-//            } else {
-//                Toast.makeText(this, "权限拒绝", Toast.LENGTH_SHORT).show();
-//            }
-//        }
+
     }
 
-//    private void getContacts(final Context context) {
-//        contactLists.clear();
-//        searchContactLists.clear();
-//        Observable.create(new ObservableOnSubscribe<ArrayList<ContactsBean>>() {
-//            @Override
-//            public void subscribe(ObservableEmitter<ArrayList<ContactsBean>> e) throws Exception {
-//                if (!e.isDisposed()) {
-//                    e.onNext(Util.getContactData(context, searchContactLists));
-//                    e.onComplete();
-//                }
-//            }
-//        }).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Observer<ArrayList<ContactsBean>>() {
-//                    @Override
-//                    public void onSubscribe(Disposable d) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onNext(ArrayList<ContactsBean> contactsBeen) {
-//                        contactLists.addAll(contactsBeen);
-//                        contactAdapter.notifyDataSetChanged();
-//                    }
-//
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    @Override
-//                    public void onComplete() {
-//                        System.out.println("");
-//                    }
-//                });
-//
-//    }
+
 private static final String TAG = "MainActivity";
     private void getContacts(){
-        SharedPreferences data = getSharedPreferences("token", MODE_PRIVATE);
-        String token = data.getString("token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpZCI6MTYsImV4cCI6MTcwMjcyMzM4NywiaWF0IjoxNzAyMTE4NTg3LCJ1c2VybmFtZSI6IjEwMDczNTcifQ.IpaPgExAvSuymcoS-SlVxSQ5qJJR_CGNEi9V_eZKW1fURkCQcawgQm2zTSVt5xJ_8tLnfjlkUshGpGggi-zxMw");
-        long poke = data.getLong("poke", 0);
+        long poke = s_data.getLong("poke", 0);
         contactLists.clear();
         searchContactLists.clear();
-//        Log.e(TAG, "getContacts: "+token );
         HttpUtil.sendGetDataForUser(token, poke, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -209,7 +238,6 @@ private static final String TAG = "MainActivity";
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     String data=response.body()!=null?response.body().string():null;
-//                Log.e(TAG, "getContacts: 进来"+data );
                 JSONObject jsonObject = null;
                 try {
                     jsonObject = new JSONObject(data);
@@ -234,6 +262,50 @@ private static final String TAG = "MainActivity";
 
             }
         });
+
+    }
+    private void getDeptNameList(){
+        String dData = s_data.getString("D_data", null);
+        Log.e(TAG, "onResponse: 11"+ dData);
+
+        if (dData!=null){
+            try {
+                deptNameList.addAll(GsonUntil.handleDeptList(dData));
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }else {
+            HttpUtil.sendGetDataForDeptNameList(token, new Callback() {
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    String data=response.body()!=null?response.body().string():null;
+                    Log.e(TAG, "onResponse: 66"+data );
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(data);
+                        String msg = jsonObject.getString("msg");
+                        if (jsonObject.getInt("code")==200) {
+                            JSONArray data1 = jsonObject.getJSONArray("data");
+                            deptNameList.addAll(GsonUntil.handleDeptList(String.valueOf(data1)));
+                            SharedPreferences.Editor edit = s_data.edit();
+                            edit.putString("D_data",String.valueOf(data1));
+                            edit.apply();
+                        }else runOnUiThread(()->{
+                            Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
+                        });
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+                }
+            });
+        }
 
     }
     //搜索数据

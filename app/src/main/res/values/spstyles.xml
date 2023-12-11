@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="customTheme">
+        <item name="dropDownListViewStyle">@style/customSpinnerStyle</item>
+    </style>
+    <style name="customSpinnerStyle" parent="android:Widget.ListView.DropDown">
+        <item name="android:textAlignment">center</item>
+        <item name="divider">@color/black</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+</resources>

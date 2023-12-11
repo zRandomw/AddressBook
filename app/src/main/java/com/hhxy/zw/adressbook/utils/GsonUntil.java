@@ -1,23 +1,16 @@
 package com.hhxy.zw.adressbook.utils;
 
-import static android.content.Context.MODE_PRIVATE;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.hhxy.zw.adressbook.Launcher;
 import com.hhxy.zw.adressbook.bean.ContactsBean;
-import com.hhxy.zw.adressbook.bean.User;
+import com.hhxy.zw.adressbook.bean.Dept;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.crud.LitePalSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +37,12 @@ public class GsonUntil{
         }return false;
     }
     public static ArrayList<ContactsBean> handleUserList(String data) throws JSONException {
-        return new Gson().fromJson(data,new TypeToken<List<ContactsBean>>(){}.getType());
+        ArrayList<ContactsBean> o = new Gson().fromJson(data, new TypeToken<List<ContactsBean>>() {
+        }.getType());
+
+        return o;
+    }
+    public static ArrayList<Dept> handleDeptList(String data) throws JSONException {
+        return new Gson().fromJson(data,new TypeToken<List<Dept>>(){}.getType());
     }
 }

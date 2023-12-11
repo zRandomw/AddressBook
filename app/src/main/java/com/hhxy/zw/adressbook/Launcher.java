@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,17 +53,7 @@ public class Launcher extends AppCompatActivity {
         pre = getSharedPreferences("data", MODE_PRIVATE);
         editor = getSharedPreferences("data", MODE_PRIVATE).edit();
         isFirst = pre.getBoolean("isFirst", true);
-        if (isFirst){
-            Log.d("TAG", "initView: "+1);
-            handler.sendEmptyMessageDelayed(HANDLER_SPLASH, 3000);
-        }else {
-            SharedPreferences tokendata = getSharedPreferences("tokendata", MODE_PRIVATE);
-//            String url = tokendata.getString("url", SetHttpIpPort.url);
-//            SetHttpIpPort.setUrl(url);
-//            Log.d("TAG", "initView: "+url);
-            handler.sendEmptyMessageDelayed(HANDLER_SPLASH, 3000);
-        }
-
+        handler.sendEmptyMessageDelayed(HANDLER_SPLASH, 3000);
 
     }
     private boolean isFirst() {
