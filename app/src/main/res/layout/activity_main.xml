@@ -49,13 +49,17 @@
 
     </LinearLayout>
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvContacts"
-        android:layout_width="match_parent"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refresh"
         android:layout_height="match_parent"
-        android:layout_below="@+id/a"/>
-
+        android:layout_below="@+id/a"
+        android:layout_width="match_parent">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvContacts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <com.hhxy.zw.adressbook.view.QuickIndexBar
         android:id="@+id/qiBar"
         android:layout_width="30dp"

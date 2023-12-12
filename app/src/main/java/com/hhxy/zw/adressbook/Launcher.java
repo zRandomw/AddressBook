@@ -30,7 +30,7 @@ public class Launcher extends AppCompatActivity {
                         startActivity(new Intent(Launcher.this,LoginActivity.class));
                     } else {
                         Log.d("TAG", "handleMessage: "+isFirst);
-                        startActivity(new Intent(Launcher.this, LoginActivity.class));
+                        startActivity(new Intent(Launcher.this, MainActivity.class));
                     }
                     finish();
                     break;

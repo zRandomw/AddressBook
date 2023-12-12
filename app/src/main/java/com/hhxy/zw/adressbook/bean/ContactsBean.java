@@ -4,6 +4,8 @@ package com.hhxy.zw.adressbook.bean;
 import androidx.annotation.NonNull;
 
 
+import com.google.gson.annotations.SerializedName;
+
 import org.litepal.crud.LitePalSupport;
 
 import java.io.Serializable;
@@ -19,7 +21,8 @@ public class ContactsBean extends LitePalSupport implements Comparable<ContactsB
 
     private static final long serialVersionUID = 1L;
 
-    private long id;//通讯录ID
+    @SerializedName(value = "id")
+    private long uid;//通讯录ID
     private String name; //名字
     private String phone;//电话号码
     private String pinyinFirst;//拼音首字母用于悬浮栏
@@ -110,11 +113,11 @@ public class ContactsBean extends LitePalSupport implements Comparable<ContactsB
     }
 
     public Long getid() {
-        return id;
+        return uid;
     }
 
     public void setid(Long id) {
-        this.id = id;
+        this.uid = id;
     }
 
     public String getName() {
@@ -203,11 +206,11 @@ public class ContactsBean extends LitePalSupport implements Comparable<ContactsB
     }
 
     public long getId() {
-        return this.id;
+        return this.uid;
     }
 
     public void setId(long id) {
-        this.id = id;
+        this.uid = id;
     }
 
     public String getPhone() {

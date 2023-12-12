@@ -16,14 +16,12 @@ import java.util.Comparator;
 
 public class Util {
     private static String indexStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    public static ArrayList<ContactsBean> getContactData(ArrayList<ContactsBean> searchContactLists) {
+    public static ArrayList<ContactsBean> getContactDataAndSave(ArrayList<ContactsBean> searchContactLists) {
         //向下移动光标
             //取得联系人名字
-        searchContactLists.forEach(o->{
-            getContactById(o);
-        });
-
+        searchContactLists.forEach(Util::getContactById);
         Collections.sort(searchContactLists, new SortByPinyin());//数据排序
+        searchContactLists.forEach(ContactsBean::save);
         return searchContactLists;
     }
 
