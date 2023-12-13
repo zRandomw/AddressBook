@@ -19,9 +19,9 @@ import okhttp3.RequestBody;
 public class HttpUtil {
 //    public final static String url="http://192.168.41.75:9000";
     public final static String url="http://10.0.2.2:9000";
+    static OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new MyInterceptor()).build();
     public static final MediaType JSON = MediaType.parse("application/json");
     public static void senOkHttpLogin(String url, String userAccount, String passWord,Callback callback) {
-        OkHttpClient client = new OkHttpClient();
         JSONObject jsonObject=new JSONObject();
         try {
             jsonObject.put("phone",userAccount);
@@ -38,7 +38,7 @@ public class HttpUtil {
     private static final String TAG = "HttpUtil";
 
     public static void senOkHttpRegitster(String url, String userAccount, String passWord, String userphone, String usersex, Callback callback) {
-        OkHttpClient client = new OkHttpClient();
+
         JSONObject jsonObject=new JSONObject();
         try {
             jsonObject.put("userName",userAccount);
@@ -57,19 +57,16 @@ public class HttpUtil {
         String url=null;
         if (0 == poke) url = HttpUtil.url + "/api/people/list";
         else url = HttpUtil.url + "/api/people/afterList/"+poke;
-        OkHttpClient client = new OkHttpClient();
         Request request=new Request.Builder().header("Authorization",token).url(url).build();
         client.newCall(request).enqueue(callback);
     }
     public static void sendGetDataForDeptNameList(String token,Callback callback) {
         String url= HttpUtil.url+"/api/dept/list";
-        OkHttpClient client = new OkHttpClient();
         Request request=new Request.Builder().header("Authorization",token).url(url).build();
         client.newCall(request).enqueue(callback);
     }
     public static void sendGetDataUserForDeptId(String token,int id,Callback callback) {
         String url= HttpUtil.url+"/api/people/getByDeptId/"+id;
-        OkHttpClient client = new OkHttpClient();
         Request request=new Request.Builder().header("Authorization",token).url(url).build();
         client.newCall(request).enqueue(callback);
     }

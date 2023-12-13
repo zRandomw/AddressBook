@@ -27,7 +27,12 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:exported="false" />
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.hhxy.zw.adressbook.ACTION_START" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">

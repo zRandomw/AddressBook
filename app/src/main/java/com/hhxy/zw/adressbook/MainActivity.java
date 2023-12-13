@@ -202,50 +202,48 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 contactLists.clear();
                 Dept dept = ((Dept) parent.getItemAtPosition(position));
                 List<ContactsBean> user = dept.getUser();
-                user.forEach(o->{
-                    Log.e(TAG, "onResponse 667: "+o.getName() );
-                });
-                if (user.size()>0){
+//                user.forEach(o->{
+//                    Log.e(TAG, "onResponse 667: "+o.getName() );
+//                });
+
                     user.sort(new Util.SortByPinyin());
                     searchContactLists.addAll(dept.getUser());
                     contactLists.addAll(searchContactLists);
                     contactAdapter.notifyDataSetChanged();
-                    return;
-                }
-                HttpUtil.sendGetDataUserForDeptId(token, dept.getDid(),new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-                    }
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                            String data=response.body()!=null?response.body().string():null;
-                        JSONObject jsonObject = null;
-                        try {
-                            jsonObject = new JSONObject(data);
-                            String msg = jsonObject.getString("msg");
-                            int code = jsonObject.getInt("code");
-                            if (code==200) {
-                                JSONArray data1 = jsonObject.getJSONArray("data");
-                                ArrayList<ContactsBean> contacts = GsonUntil.handleDeptUserList((String.valueOf(data1)));
-                                contacts.forEach(Util::getContactById);
-                                contacts.sort(new Util.SortByPinyin());
-                                searchContactLists.addAll(contacts);
-                                contactLists.addAll(searchContactLists);
-                                runOnUiThread(()->{
-                                            contactAdapter.notifyDataSetChanged();
-                                }
-                                );
-                            }else runOnUiThread(()->{
-                                Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
-                            });
-
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                    }
-                });
+//                HttpUtil.sendGetDataUserForDeptId(token, dept.getDid(),new Callback() {
+//                    @Override
+//                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+//
+//                    }
+//                    @Override
+//                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+//                            String data=response.body()!=null?response.body().string():null;
+//                        JSONObject jsonObject = null;
+//                        try {
+//                            jsonObject = new JSONObject(data);
+//                            String msg = jsonObject.getString("msg");
+//                            int code = jsonObject.getInt("code");
+//                            if (code==200) {
+//                                JSONArray data1 = jsonObject.getJSONArray("data");
+//                                ArrayList<ContactsBean> contacts = GsonUntil.handleDeptUserList((String.valueOf(data1)));
+//                                contacts.forEach(Util::getContactById);
+//                                contacts.sort(new Util.SortByPinyin());
+//                                searchContactLists.addAll(contacts);
+//                                contactLists.addAll(searchContactLists);
+//                                runOnUiThread(()->{
+//                                            contactAdapter.notifyDataSetChanged();
+//                                }
+//                                );
+//                            }else runOnUiThread(()->{
+//                                Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
+//                            });
+//
+//                        } catch (JSONException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//
+//                    }
+//                });
             }
 
             @Override
@@ -330,7 +328,7 @@ private static final String TAG = "MainActivity";
                         } else {
                             runOnUiThread(()->{
                                 Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+
                             });
                         }
                     } catch (JSONException e) {

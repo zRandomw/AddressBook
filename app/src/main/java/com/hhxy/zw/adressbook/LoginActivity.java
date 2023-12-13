@@ -53,7 +53,6 @@ public class LoginActivity extends AppCompatActivity implements ToActivity {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 String string = response.body() != null ? response.body().string() : null;
-                Log.e(TAG, "onResponse: "+string );
                 if (GsonUntil.handleLogin(string,LoginActivity.this)) {
                     runOnUiThread(()->{
                         Toast.makeText(LoginActivity.this,"登录成功",Toast.LENGTH_LONG).show();
