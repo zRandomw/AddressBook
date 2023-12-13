@@ -17,15 +17,12 @@ import java.util.Comparator;
 public class Util {
     private static String indexStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static ArrayList<ContactsBean> getContactDataAndSave(ArrayList<ContactsBean> searchContactLists) {
-        //向下移动光标
-            //取得联系人名字
         searchContactLists.forEach(Util::getContactById);
-        Collections.sort(searchContactLists, new SortByPinyin());//数据排序
         searchContactLists.forEach(ContactsBean::save);
         return searchContactLists;
     }
 
-    private static void getContactById(ContactsBean c) {
+    public static void getContactById(ContactsBean c) {
                 if (c.getName()!=null) {
                     getPinyinList(c);
                 } else {
@@ -69,7 +66,7 @@ public class Util {
     /**
      * 按照名字分类方便索引
      */
-    static class SortByPinyin implements Comparator {
+    public static class SortByPinyin implements Comparator {
         public int compare(Object o1, Object o2) {
             ContactsBean s1 = (ContactsBean) o1;
             ContactsBean s2 = (ContactsBean) o2;

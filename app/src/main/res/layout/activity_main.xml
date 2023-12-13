@@ -30,21 +30,29 @@
                 android:textSize="14sp"
                 android:inputType="text" />
         </LinearLayout>
-
-        <Spinner
-            android:id="@+id/sp"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_weight="1.8"
             android:gravity="center"
+            android:paddingEnd="5dp"
+            android:orientation="horizontal"
+            android:layout_height="match_parent">
+            <Spinner
+                android:id="@+id/sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:overlapAnchor="false"
+                android:dropDownVerticalOffset="23dp"
+                android:background="@drawable/selector_for_custom_spinner"
+                android:popupBackground="@drawable/shape_for_custom_spinner"
+                style="@style/customSpinnerStyle"
+                android:dropDownSelector="@drawable/selector_for_custom_spinner"
+                android:dropDownWidth="wrap_content"
+                android:spinnerMode="dropdown"
+                tools:ignore="TouchTargetSizeCheck" />
+        </LinearLayout>
 
-            android:layout_weight="1.5"
-            android:overlapAnchor="false"
-            android:background="@drawable/selector_for_custom_spinner"
-            android:popupBackground="@drawable/shape_for_custom_spinner"
-            style="@style/customSpinnerStyle"
-            android:dropDownWidth="wrap_content"
-            android:spinnerMode="dropdown"
-            tools:ignore="TouchTargetSizeCheck" />
 
 
     </LinearLayout>

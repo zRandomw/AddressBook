@@ -155,7 +155,7 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
             nickName = (TextView) itemView.findViewById(R.id.tv_name);
             tvphone = (TextView) itemView.findViewById(R.id.tv_phone);
             diviView = itemView.findViewById(R.id.vw_divisition);
-            Log.e(TAG, "nickName: "+nickName.getHeight() );
+
         }
     }
 
@@ -165,7 +165,7 @@ public class PhoneContactAdapter extends RecyclerView.Adapter<PhoneContactAdapte
         public HeaderHolder(View itemView) {
             super(itemView);
             header = (TextView) itemView;
-            Log.e(TAG, "HeaderHolder: "+header.getHeight() );
+//            Log.e(TAG, "HeaderHolder: "+header.getHeight() );
         }
     }
 

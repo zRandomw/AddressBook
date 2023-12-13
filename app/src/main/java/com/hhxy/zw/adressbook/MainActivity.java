@@ -48,6 +48,7 @@ import org.litepal.tablemanager.Connector;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.Call;
@@ -87,12 +88,15 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     private void getContacts() {
+
         List<ContactsBean> user = LitePal.findAll(ContactsBean.class);
         if (user.size()>0){
             searchContactLists.clear();
             contactLists.clear();
+            user.sort(new Util.SortByPinyin());
             searchContactLists.addAll(user);
             contactLists.addAll(searchContactLists);
+            contactAdapter.notifyDataSetChanged();
         }else {
             requestGetContacts();
         }
@@ -189,17 +193,26 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     flag[0] = flag[0] + 1;
                     return;
                 }
-
                 if (position==0){
                     getContacts();
                     current=ALL_USER;
                     return;
                 }else current=DEPT_NAME_USER;
-
-                int id1 = ((Dept) parent.getItemAtPosition(position)).getId();
                 searchContactLists.clear();
                 contactLists.clear();
-                HttpUtil.sendGetDataUserForDeptId(token, id1,new Callback() {
+                Dept dept = ((Dept) parent.getItemAtPosition(position));
+                List<ContactsBean> user = dept.getUser();
+                user.forEach(o->{
+                    Log.e(TAG, "onResponse 667: "+o.getName() );
+                });
+                if (user.size()>0){
+                    user.sort(new Util.SortByPinyin());
+                    searchContactLists.addAll(dept.getUser());
+                    contactLists.addAll(searchContactLists);
+                    contactAdapter.notifyDataSetChanged();
+                    return;
+                }
+                HttpUtil.sendGetDataUserForDeptId(token, dept.getDid(),new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -211,9 +224,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                         try {
                             jsonObject = new JSONObject(data);
                             String msg = jsonObject.getString("msg");
-                            if (jsonObject.getInt("code")==200) {
+                            int code = jsonObject.getInt("code");
+                            if (code==200) {
                                 JSONArray data1 = jsonObject.getJSONArray("data");
-                                searchContactLists.addAll(Util.getContactDataAndSave(GsonUntil.handleUserList(String.valueOf(data1))));
+                                ArrayList<ContactsBean> contacts = GsonUntil.handleDeptUserList((String.valueOf(data1)));
+                                contacts.forEach(Util::getContactById);
+                                contacts.sort(new Util.SortByPinyin());
+                                searchContactLists.addAll(contacts);
                                 contactLists.addAll(searchContactLists);
                                 runOnUiThread(()->{
                                             contactAdapter.notifyDataSetChanged();
@@ -249,9 +266,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
 private static final String TAG = "MainActivity";
     private void requestGetContacts(){
+
         long poke = s_data.getLong("poke", 0);
-        contactLists.clear();
-        searchContactLists.clear();
         HttpUtil.sendGetDataForUser(token, poke, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -262,18 +278,21 @@ private static final String TAG = "MainActivity";
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    String data=response.body()!=null?response.body().string():null;
+                String data=response.body()!=null?response.body().string():null;
                 JSONObject jsonObject = null;
                 try {
                     jsonObject = new JSONObject(data);
                     String msg = jsonObject.getString("msg");
                     if (jsonObject.getInt("code")==200) {
                         JSONArray data1 = jsonObject.getJSONArray("data");
-                        searchContactLists.addAll(Util.getContactDataAndSave(GsonUntil.handleUserList(String.valueOf(data1))));
-                        contactLists.addAll(searchContactLists);
-                        Log.e(TAG, "onResponse: "+contactLists.get(1).getName() );
+                        Long poke = jsonObject.getLong("poke");
+                        GsonUntil.handleUserList(String.valueOf(data1));
+//                        Log.e(TAG, "onResponse: "+contactLists.get(1).getName() );
                         runOnUiThread(()->{
-                            contactAdapter.notifyDataSetChanged();
+                                    SharedPreferences.Editor edit = s_data.edit();
+                                    edit.putLong("poke", poke);
+                                    edit.apply();
+                                    getContacts();
                                     refresh.setRefreshing(false);
                         }
                         );
@@ -291,7 +310,7 @@ private static final String TAG = "MainActivity";
 
     }
     private void requestGetDeptNameList(){
-
+        LitePal.deleteAll(Dept.class);
             HttpUtil.sendGetDataForDeptNameList(token, new Callback() {
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
@@ -300,19 +319,20 @@ private static final String TAG = "MainActivity";
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject(data);
-                        String msg = jsonObject.getString("msg");
-                        if (jsonObject.getInt("code")==200) {
+                        final String msg = jsonObject.getString("msg");
+                        final int code = jsonObject.getInt("code");
+                        if (code==200) {
                             JSONArray data1 = jsonObject.getJSONArray("data");
-                            deptNameList.addAll(GsonUntil.handleDeptList(String.valueOf(data1)));
-                            SharedPreferences.Editor edit = s_data.edit();
-                            edit.putString("D_data",String.valueOf(data1));
-                            edit.apply();
-                        }else runOnUiThread(()->{
-                            Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
-                            startActivity(new Intent(MainActivity.this,LoginActivity.class));
-
-                        });
-
+                            GsonUntil.handleDeptList(String.valueOf(data1));
+                            runOnUiThread(()->{
+                                getDeptNameList();
+                            });
+                        } else {
+                            runOnUiThread(()->{
+                                Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                            });
+                        }
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
@@ -328,14 +348,11 @@ private static final String TAG = "MainActivity";
 
 
     private void getDeptNameList(){
-        String dData = s_data.getString("D_data", null);
-        Log.e(TAG, "onResponse: 11"+ dData);
-        if (dData!=null){
-            try {
-                deptNameList.addAll(GsonUntil.handleDeptList(dData));
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
+        List<Dept> all = LitePal.findAll(Dept.class);
+        if (all.size()>0){
+            Log.e(TAG, "getDeptNameList: 进来了？");
+                deptNameList.addAll(all);
+                sAdapter.notifyDataSetChanged();
         }else {
             requestGetDeptNameList();
         }
@@ -568,6 +585,7 @@ private static final String TAG = "MainActivity";
                 }).start();
                 break;
             case DEPT_NAME_USER:
+
                 refresh.setRefreshing(false);
         }
 

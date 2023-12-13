@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import org.litepal.crud.LitePalSupport;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GsonUntil{
@@ -39,10 +40,19 @@ public class GsonUntil{
     public static ArrayList<ContactsBean> handleUserList(String data) throws JSONException {
         ArrayList<ContactsBean> o = new Gson().fromJson(data, new TypeToken<List<ContactsBean>>() {
         }.getType());
-
+        Util.getContactDataAndSave(o);
+        return o;
+    }
+    public static ArrayList<ContactsBean> handleDeptUserList(String data) throws JSONException {
+        ArrayList<ContactsBean> o = new Gson().fromJson(data, new TypeToken<List<ContactsBean>>() {
+        }.getType());
         return o;
     }
     public static ArrayList<Dept> handleDeptList(String data) throws JSONException {
-        return new Gson().fromJson(data,new TypeToken<List<Dept>>(){}.getType());
+       ArrayList<Dept> depts= new Gson().fromJson(data, new TypeToken<List<Dept>>() {
+        }.getType());
+       depts.forEach(Dept::save);
+        Log.e(TAG, "handleDeptList: "+ Arrays.toString(depts.toArray()));
+        return depts;
     }
 }

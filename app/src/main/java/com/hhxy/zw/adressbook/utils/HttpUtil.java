@@ -17,6 +17,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class HttpUtil {
+//    public final static String url="http://192.168.41.75:9000";
     public final static String url="http://10.0.2.2:9000";
     public static final MediaType JSON = MediaType.parse("application/json");
     public static void senOkHttpLogin(String url, String userAccount, String passWord,Callback callback) {
@@ -53,7 +54,9 @@ public class HttpUtil {
      }
 
     public static void sendGetDataForUser(String token,Long poke,Callback callback) {
-        String url= HttpUtil.url+"/api/people/list";
+        String url=null;
+        if (0 == poke) url = HttpUtil.url + "/api/people/list";
+        else url = HttpUtil.url + "/api/people/afterList/"+poke;
         OkHttpClient client = new OkHttpClient();
         Request request=new Request.Builder().header("Authorization",token).url(url).build();
         client.newCall(request).enqueue(callback);

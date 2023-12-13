@@ -1,18 +1,43 @@
 package com.hhxy.zw.adressbook.bean;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
-public class Dept {
-    private int id;
+import com.google.gson.annotations.SerializedName;
+
+import org.litepal.LitePal;
+import org.litepal.crud.LitePalSupport;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Dept extends LitePalSupport {
+    @SerializedName(value = "id")
+    private int deptId;
     private String name;
     private String pid;
-    public int getId() {
-        return id;
+    private List<ContactsBean> contactsBeanList=new ArrayList<>();
+
+    public int getDid() {
+        return deptId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setDid(int did) {
+        this.deptId = did;
     }
+
+
+    public List<ContactsBean> getUser() {
+        return LitePal.where("deptid = ?", String.valueOf(deptId)).find(ContactsBean.class);
+    }
+
+    public void setUser(List<ContactsBean> user) {
+        this.contactsBeanList = user;
+    }
+
+
+
 
     public String getName() {
         return name;
@@ -34,5 +59,13 @@ public class Dept {
 
     public void setPid(String pid) {
         this.pid = pid;
+    }
+    public boolean save() {
+        List<ContactsBean> where = LitePal.where("dept_id = ?", String.valueOf(deptId)).find(ContactsBean.class);
+        if (where.size()>0){
+            this.updateAll("uid = ?",String.valueOf(deptId));
+            return true;
+        }
+        return super.save();
     }
 }
