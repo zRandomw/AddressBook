@@ -42,7 +42,7 @@ public class MyInterceptor implements Interceptor {
 
             //bodyString: {"error":"Token已经失效,或账号在别处登录！","status":-100}
             String bodyString = buffer.clone().readString(charset);
-            Log.e(TAG, "intercept: "+bodyString );
+//            Log.e(TAG, "intercept: "+bodyString );
             try {
                 JSONObject jsonObject = new JSONObject(bodyString);
                 int code = jsonObject.getInt("code");

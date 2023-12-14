@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <corners android:radius="10dp" />
-    <solid android:color="#61595A51" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@android:color/transparent" /> <!-- 设置背景色为透明 -->
     <stroke
-        android:color="@color/white"
-        android:width="2dp" />
-    <size
-        android:width="200dp"
-        android:height="50dp" />
+        android:color="@android:color/black"
+        android:width="5dp" /> <!-- 设置下划线的粗细 --><!-- 设置下划线的颜色 -->
 </shape>

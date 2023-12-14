@@ -13,18 +13,16 @@
             android:layout_width="0dp"
             android:layout_weight="8"
             android:layout_height="wrap_content"
-            android:background="@drawable/ser"
             android:orientation="horizontal">
-            <View
-                android:layout_width="30dp"
-                android:layout_gravity="center"
-                android:layout_height="30dp"
-                android:background="@drawable/ic_search_black_24dp"/>
             <EditText
                 android:id="@+id/mEtSearch"
+                android:drawableStart="@drawable/ic_search_black_24dp"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:drawablePadding="6dp"
+                android:backgroundTint="@color/black"
+                android:paddingTop="5dp"
                 android:hint="搜索"
                 android:textColor="@color/colorAccent"
                 android:textSize="14sp"
@@ -39,16 +37,17 @@
             android:layout_height="match_parent">
             <Spinner
                 android:id="@+id/sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:overlapAnchor="false"
+
                 android:dropDownVerticalOffset="23dp"
                 android:background="@drawable/selector_for_custom_spinner"
                 android:popupBackground="@drawable/shape_for_custom_spinner"
                 style="@style/customSpinnerStyle"
                 android:dropDownSelector="@drawable/selector_for_custom_spinner"
-                android:dropDownWidth="70dp"
+                android:dropDownWidth="75dp"
                 android:spinnerMode="dropdown"
                 tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>

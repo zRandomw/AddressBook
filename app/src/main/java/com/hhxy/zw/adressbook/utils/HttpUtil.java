@@ -18,7 +18,7 @@ import okhttp3.RequestBody;
 
 public class HttpUtil {
 //    public final static String url="http://192.168.41.75:9000";
-    public final static String url="http://10.0.2.2:9000";
+    public  static String url="http://10.0.2.2:9000";
     static OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new MyInterceptor()).build();
     public static final MediaType JSON = MediaType.parse("application/json");
     public static void senOkHttpLogin(String url, String userAccount, String passWord,Callback callback) {

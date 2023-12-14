@@ -24,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.activity_main);
         Connector.getDatabase();
         s_data=getSharedPreferences("token",MODE_PRIVATE);
@@ -115,9 +117,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         //数据列表
         rvContacts = (RecyclerView) findViewById(R.id.rvContacts);
         deptNameList=new ArrayList<>();
-        Dept dept = new Dept();
-        dept.setName("全部");
-        deptNameList.add(dept);
         sAdapter=new ArrayAdapter<Dept>(this,R.layout.item_for_custom_spinner,deptNameList);
         spinner.setAdapter(sAdapter);
         manager = new LinearLayoutManager(this);
@@ -202,14 +201,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 contactLists.clear();
                 Dept dept = ((Dept) parent.getItemAtPosition(position));
                 List<ContactsBean> user = dept.getUser();
-//                user.forEach(o->{
-//                    Log.e(TAG, "onResponse 667: "+o.getName() );
-//                });
-
-                    user.sort(new Util.SortByPinyin());
-                    searchContactLists.addAll(dept.getUser());
-                    contactLists.addAll(searchContactLists);
-                    contactAdapter.notifyDataSetChanged();
+                user.sort(new Util.SortByPinyin());
+                searchContactLists.addAll(dept.getUser());
+                contactLists.addAll(searchContactLists);
+                contactAdapter.notifyDataSetChanged();
 //                HttpUtil.sendGetDataUserForDeptId(token, dept.getDid(),new Callback() {
 //                    @Override
 //                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -270,7 +265,7 @@ private static final String TAG = "MainActivity";
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 runOnUiThread(()->{
-                    Toast.makeText(MainActivity.this,e.toString(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this,"可能没有网络或ip设置错误",Toast.LENGTH_LONG).show();
                 });
             }
             @SuppressLint("NotifyDataSetChanged")
@@ -308,12 +303,11 @@ private static final String TAG = "MainActivity";
 
     }
     private void requestGetDeptNameList(){
-        LitePal.deleteAll(Dept.class);
+
             HttpUtil.sendGetDataForDeptNameList(token, new Callback() {
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     String data=response.body()!=null?response.body().string():null;
-                    Log.e(TAG, "onResponse: 66"+data );
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject(data);
@@ -321,8 +315,10 @@ private static final String TAG = "MainActivity";
                         final int code = jsonObject.getInt("code");
                         if (code==200) {
                             JSONArray data1 = jsonObject.getJSONArray("data");
-                            GsonUntil.handleDeptList(String.valueOf(data1));
                             runOnUiThread(()->{
+                                LitePal.deleteAll(Dept.class);
+                                GsonUntil.handleDeptList(String.valueOf(data1));
+                                deptNameList.clear();
                                 getDeptNameList();
                             });
                         } else {
@@ -348,7 +344,10 @@ private static final String TAG = "MainActivity";
     private void getDeptNameList(){
         List<Dept> all = LitePal.findAll(Dept.class);
         if (all.size()>0){
-            Log.e(TAG, "getDeptNameList: 进来了？");
+                deptNameList.clear();
+                Dept dept = new Dept();
+                dept.setName("全部");
+                deptNameList.add(dept);
                 deptNameList.addAll(all);
                 sAdapter.notifyDataSetChanged();
         }else {
@@ -583,8 +582,7 @@ private static final String TAG = "MainActivity";
                 }).start();
                 break;
             case DEPT_NAME_USER:
-
-                refresh.setRefreshing(false);
+                 refresh.setRefreshing(false);
         }
 
     }
