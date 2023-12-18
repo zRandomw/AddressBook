@@ -95,7 +95,10 @@ public class LoginActivity extends AppCompatActivity implements ToActivity {
         HttpUtil.senOkHttpLogin(HttpUtil.url+"/api/sys/login", phone, pass, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Log.e(TAG, "onFailure: "+e.toString() );
+                runOnUiThread(()->{
+                    Toast.makeText(LoginActivity.this,"ip或端口号未设置或设置错误",Toast.LENGTH_LONG).show();
+                });
+
             }
 
             @Override

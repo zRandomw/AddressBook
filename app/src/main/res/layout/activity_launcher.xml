@@ -20,7 +20,7 @@
         android:layout_marginTop="65dp"
         android:layout_marginEnd="65dp"
         android:layout_marginBottom="65dp"
-        android:text="欢迎使用怀化学院通讯录"
+        android:text="欢迎使用通讯录"
         android:textColor="@color/black"
         android:textSize="24sp" />
 

@@ -24,7 +24,6 @@ public class GsonUntil{
             try {
                 JSONObject jsonObject = new JSONObject(data);
                 String msg = jsonObject.getString("msg");
-                Log.e(TAG, "handleLogin: "+ msg);
                 int code = jsonObject.getInt("code");
                 if (code==200){
                     String token = jsonObject.getString("token");

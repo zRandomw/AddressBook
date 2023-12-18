@@ -35,21 +35,16 @@
             android:paddingEnd="5dp"
             android:orientation="horizontal"
             android:layout_height="match_parent">
-            <Spinner
-                android:id="@+id/sp"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:overlapAnchor="false"
-
-                android:dropDownVerticalOffset="23dp"
-                android:background="@drawable/selector_for_custom_spinner"
-                android:popupBackground="@drawable/shape_for_custom_spinner"
-                style="@style/customSpinnerStyle"
-                android:dropDownSelector="@drawable/selector_for_custom_spinner"
-                android:dropDownWidth="75dp"
-                android:spinnerMode="dropdown"
-                tools:ignore="TouchTargetSizeCheck" />
+        <com.hhxy.zw.adressbook.utils.MyButton
+            android:id="@+id/Dept"
+            android:layout_width="match_parent"
+            android:background="#0000"
+            android:gravity="center"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="-1"
+            android:ellipsize="marquee"
+            android:layout_height="match_parent"
+            android:text="筛选" />
         </LinearLayout>
 
 

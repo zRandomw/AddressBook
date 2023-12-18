@@ -27,9 +27,14 @@ public class Dept extends LitePalSupport {
         this.deptId = did;
     }
 
-
+    private static final String TAG = "Dept";
     public List<ContactsBean> getUser() {
-        return LitePal.where("deptid = ?", String.valueOf(deptId)).find(ContactsBean.class);
+        List<ContactsBean> all=null;
+        if (name.equals("全部")){
+            all = LitePal.findAll(ContactsBean.class);
+            Log.e(TAG, "getUser: 进来了？" );
+        }else all=LitePal.where("deptid = ?", String.valueOf(deptId)).find(ContactsBean.class);
+        return all;
     }
 
     public void setUser(List<ContactsBean> user) {

@@ -28,7 +28,7 @@
                 <ImageView
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/sx_1"/>
+                    android:src="@android:drawable/btn_star_big_on"/>
             </androidx.cardview.widget.CardView>
 
             <RelativeLayout

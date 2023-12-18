@@ -49,6 +49,7 @@ public class ContactsBean extends LitePalSupport implements Comparable<ContactsB
         this.delete = delete;
     }
 
+    @SerializedName(value = "deleted")
     private int delete=0;//  判断是否被删除
     private List<String> namePinyinList = new ArrayList<>();//名字拼音集合，比如你好，NI,HAO
 //    private ArrayList<String> phoneList = new ArrayList<>();//电话号码集合，一个人可能会有多个号码
@@ -239,7 +240,9 @@ public class ContactsBean extends LitePalSupport implements Comparable<ContactsB
     }
     @Override
     public boolean save() {
+        Log.e(TAG, "save: "+delete );
         if (delete==1){
+            Log.e(TAG, "save: "+delete );
             LitePal.deleteAll(ContactsBean.class,"uid = ?",String.valueOf(uid));
             return true;
         }

@@ -1,7 +1,9 @@
 package com.hhxy.zw.adressbook;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -9,16 +11,21 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,6 +42,7 @@ import com.hhxy.zw.adressbook.bean.Dept;
 import com.hhxy.zw.adressbook.utils.GsonUntil;
 import com.hhxy.zw.adressbook.utils.HttpUtil;
 import com.hhxy.zw.adressbook.utils.MyApplication;
+import com.hhxy.zw.adressbook.utils.MyButton;
 import com.hhxy.zw.adressbook.utils.RegexChk;
 import com.hhxy.zw.adressbook.utils.Util;
 import com.hhxy.zw.adressbook.view.QuickIndexBar;
@@ -70,23 +78,29 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     SharedPreferences s_data ;
     private LinearLayoutManager manager;
     private StickyHeaderDecoration decoration;
-    private Spinner spinner;
     private SwipeRefreshLayout refresh;
+
+    private MyButton dept;
     ArrayAdapter<Dept> sAdapter;
     List<Dept> deptNameList;
     String token;
-
+    AlertDialog.Builder builder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.activity_main);
         Connector.getDatabase();
         s_data=getSharedPreferences("token",MODE_PRIVATE);
         initView();
         token= s_data.getString("token", null);
-        getContacts();
-        getDeptNameList();
+        if (token!=null){
+            getContacts();
+            getDeptNameList();
+        }else {
+            startActivity(new Intent(this,LoginActivity.class));
+        }
+
     }
 
     private void getContacts() {
@@ -106,8 +120,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView() {
-//        下拉选择框
-        spinner=(Spinner)findViewById(R.id.sp);
+//        筛选按钮
+        dept=(MyButton)findViewById(R.id.Dept);
+
 //        下拉刷新
         refresh=(SwipeRefreshLayout)findViewById(R.id.refresh);
         //搜索框
@@ -118,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         rvContacts = (RecyclerView) findViewById(R.id.rvContacts);
         deptNameList=new ArrayList<>();
         sAdapter=new ArrayAdapter<Dept>(this,R.layout.item_for_custom_spinner,deptNameList);
-        spinner.setAdapter(sAdapter);
         manager = new LinearLayoutManager(this);
         rvContacts.setLayoutManager(manager);
         rvContacts.setHasFixedSize(true);
@@ -183,69 +197,34 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 filtDatas(s);
             }
         });
-        final int[] flag = {0};
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (flag[0] == 0){
-                    flag[0] = flag[0] + 1;
-                    return;
-                }
-                if (position==0){
-                    getContacts();
+        DisplayMetrics metrics =getResources().getDisplayMetrics();
+        int width = metrics.widthPixels;
+        int height = metrics.heightPixels;
+        dept.setOnClickListener(v->{
+            builder= new AlertDialog.Builder(this);
+            builder.setTitle("选择部门");
+            builder.setAdapter(sAdapter,(a,w)->{
+                if (w==0){
                     current=ALL_USER;
-                    return;
                 }else current=DEPT_NAME_USER;
                 searchContactLists.clear();
                 contactLists.clear();
-                Dept dept = ((Dept) parent.getItemAtPosition(position));
-                List<ContactsBean> user = dept.getUser();
+                Dept dept1 = deptNameList.get(w);
+                dept.setText(dept1.toString());
+                List<ContactsBean> user = dept1.getUser();
                 user.sort(new Util.SortByPinyin());
-                searchContactLists.addAll(dept.getUser());
+                searchContactLists.addAll(user);
                 contactLists.addAll(searchContactLists);
                 contactAdapter.notifyDataSetChanged();
-//                HttpUtil.sendGetDataUserForDeptId(token, dept.getDid(),new Callback() {
-//                    @Override
-//                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-//
-//                    }
-//                    @Override
-//                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-//                            String data=response.body()!=null?response.body().string():null;
-//                        JSONObject jsonObject = null;
-//                        try {
-//                            jsonObject = new JSONObject(data);
-//                            String msg = jsonObject.getString("msg");
-//                            int code = jsonObject.getInt("code");
-//                            if (code==200) {
-//                                JSONArray data1 = jsonObject.getJSONArray("data");
-//                                ArrayList<ContactsBean> contacts = GsonUntil.handleDeptUserList((String.valueOf(data1)));
-//                                contacts.forEach(Util::getContactById);
-//                                contacts.sort(new Util.SortByPinyin());
-//                                searchContactLists.addAll(contacts);
-//                                contactLists.addAll(searchContactLists);
-//                                runOnUiThread(()->{
-//                                            contactAdapter.notifyDataSetChanged();
-//                                }
-//                                );
-//                            }else runOnUiThread(()->{
-//                                Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
-//                            });
-//
-//                        } catch (JSONException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//
-//                    }
-//                });
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            });
+            AlertDialog show = builder.show();
+            Window window = show.getWindow();
+            if (window != null) {
+                window.setLayout((int) (width*0.95),(int) (height*0.85));
             }
         });
+
     }
 
 
@@ -261,6 +240,7 @@ private static final String TAG = "MainActivity";
     private void requestGetContacts(){
 
         long poke = s_data.getLong("poke", 0);
+
         HttpUtil.sendGetDataForUser(token, poke, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -272,18 +252,19 @@ private static final String TAG = "MainActivity";
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 String data=response.body()!=null?response.body().string():null;
+//                Log.e(TAG, "onResponse: x "+data);
                 JSONObject jsonObject = null;
                 try {
                     jsonObject = new JSONObject(data);
                     String msg = jsonObject.getString("msg");
                     if (jsonObject.getInt("code")==200) {
                         JSONArray data1 = jsonObject.getJSONArray("data");
-                        Long poke = jsonObject.getLong("poke");
+                        Long Ipoke = jsonObject.getLong("poke");
                         GsonUntil.handleUserList(String.valueOf(data1));
 //                        Log.e(TAG, "onResponse: "+contactLists.get(1).getName() );
                         runOnUiThread(()->{
                                     SharedPreferences.Editor edit = s_data.edit();
-                                    edit.putLong("poke", poke);
+                                    edit.putLong("poke", Ipoke);
                                     edit.apply();
                                     getContacts();
                                     refresh.setRefreshing(false);
@@ -313,6 +294,7 @@ private static final String TAG = "MainActivity";
                         jsonObject = new JSONObject(data);
                         final String msg = jsonObject.getString("msg");
                         final int code = jsonObject.getInt("code");
+
                         if (code==200) {
                             JSONArray data1 = jsonObject.getJSONArray("data");
                             runOnUiThread(()->{
